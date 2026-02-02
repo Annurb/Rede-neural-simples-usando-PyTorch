@@ -38,3 +38,19 @@ class AlgebraicDataset(Dataset):
     # Qual dado ter, quando passar o indice do dado
     def __getitem__(self, idx):
         return self.data[idx]
+
+# Linha, intervalo, qnt de amostras de treinamento, qnt de testes    
+line = lambda x: 2*x+3
+interval = (-10, 10)
+train_nsamples = 1000
+test_nsamples = 100
+
+# Parâmetros passados para a classe
+train_dataset = AlgebraicDataset(line, interval, train_nsamples)
+test_dataset = AlgebraicDataset(line, interval, test_nsamples)
+
+# Quem vai me dar os dados ao longo do treinamento
+# Dataset de treinamento, olhar todos os dados(rede simples) e embaralhamento de dados
+# Quando é uma rede complexa com mais dados nao lemos os dados todos de uma vez
+train_dataloader = DataLoader(train_dataset, batch_size=train_nsamples, shuffle=True)
+test_dataloader = DataLoader(train_dataset, batch_size=test_nsamples, shuffle=True)
