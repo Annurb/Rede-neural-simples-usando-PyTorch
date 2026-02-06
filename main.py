@@ -143,10 +143,10 @@ def plot_comparinson( f, model, interval=(-10, 10), nsamples=10 ):
 
 # Treinando a rede, de fato
 # Treinar 101 vezes
-epochs = 101
+epochs = 201
 for t in range(epochs):
     train_loss = train(model, train_dataloader, lossfunc, optimizer)
-    if t % 10 == 0:
+    if t % 20 == 0:
         print(f"Epoch: {t}; Train Loss: {train_loss}")
         plot_comparinson(line, model)
 
