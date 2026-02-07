@@ -146,9 +146,62 @@ def plot_comparinson( f, model, interval=(-10, 10), nsamples=10 ):
 epochs = 201
 for t in range(epochs):
     train_loss = train(model, train_dataloader, lossfunc, optimizer)
-    if t % 20 == 0:
+    if t % 40 == 0:
         print(f"Epoch: {t}; Train Loss: {train_loss}")
         plot_comparinson(line, model)
 
 test_loss = test(model, test_dataloader, lossfunc)
 print(f"Test Loss: {test_loss}")
+
+
+#-------------------------------------------------
+# Outro exemplo com uma função nao linear
+#-------------------------------------------------
+
+class MultiLayerNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.layers = nn.Sequential(
+            # 4 Camadas ocultas
+            # Parte linear
+                nn.Linear(1, 128),
+                # Parte não linear
+                nn.ReLU(),
+                nn.Linear(128, 64),
+                nn.ReLU(),
+                nn.Linear(64, 32),
+                nn.ReLU(),
+                nn.Linear(32, 8),
+                nn.ReLU(),
+                nn.Linear(8, 1)
+        )
+    def forward(self, x):
+        return self.layers(x)
+    
+multimodel = MultiLayerNetwork().to(device)
+
+# Função referência
+from math import cos
+f = lambda x:cos(x/2)
+train_dataset = AlgebraicDataset(f, interval, train_nsamples)
+test_dataset = AlgebraicDataset(f, interval, test_nsamples)
+
+train_dataloader = DataLoader(train_dataset, train_nsamples, shuffle=True)
+test_dataloader = DataLoader(test_dataset, test_nsamples, shuffle=True)
+
+device = "cuda" if torch.cuda.is_available() else 'cpu'
+print(f"Rodando na {device}")
+
+lossfunc = nn.MSELoss()
+optimizer = torch.optim.SGD(multimodel.parameters(), lr=1e-3)
+
+epochs = 20001
+for t in range(epochs):
+    train_loss = train(multimodel, train_dataloader, lossfunc, optimizer)
+    if t % 2000 == 0:
+        print(f"Epoch: {t}; Train Loss: {train_loss}")
+        plot_comparinson(f, multimodel, nsamples=40)
+
+test_loss = test(multimodel, test_dataloader, lossfunc)
+print(f"Test Loss: {test_loss}")
+
